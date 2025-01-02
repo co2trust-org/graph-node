@@ -1,4 +1,4 @@
-use std::net::SocketAddr;
+use std::net::{IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr};
 use std::sync::Arc;
 
 use async_graphql::EmptySubscription;
@@ -119,7 +119,20 @@ impl GraphmanServer {
             .layer(cors_layer)
             .layer(Extension(schema));
 
-        let addr = SocketAddr::from(([0, 0, 0, 0], port));
+        let ipv6_enabled = std::env::var("GRAPH_NODE_IPV6").unwrap_or_default() == "true";
+    
+        info!(
+            logger,
+            "Graphman server binding configuration";
+            "ipv6_enabled" => ipv6_enabled,
+            "port" => port,
+        );
+
+        let addr = if ipv6_enabled {
+            SocketAddr::new(IpAddr::V6(Ipv6Addr::UNSPECIFIED), port)
+        } else {
+            SocketAddr::new(IpAddr::V4(Ipv4Addr::UNSPECIFIED), port)
+        };
 
         let listener = tokio::net::TcpListener::bind(addr)
             .await

@@ -7,7 +7,7 @@ use jsonrpsee::RpcModule;
 use serde_json::{self, Value as JsonValue};
 
 use std::collections::BTreeMap;
-use std::net::{Ipv4Addr, SocketAddr};
+use std::net::{IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr}; 
 
 type JsonRpcResult<T> = Result<T, jsonrpsee::core::Error>;
 
