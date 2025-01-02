@@ -45,13 +45,6 @@ impl JsonRpcServer {
         };
 
         let ipv6_enabled = std::env::var("GRAPH_NODE_IPV6").unwrap_or_default() == "true";
-    
-        info!(
-            logger,
-            "JSON-RPC server binding configuration";
-            "ipv6_enabled" => ipv6_enabled,
-            "port" => port,
-        );
 
         let socket_addr = if ipv6_enabled {
             SocketAddr::new(IpAddr::V6(Ipv6Addr::UNSPECIFIED), port)

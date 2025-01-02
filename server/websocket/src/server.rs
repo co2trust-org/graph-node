@@ -16,7 +16,7 @@ use tokio_tungstenite::tungstenite::http::{
 };
 
 /// A GraphQL subscription server based on Hyper / Websockets.
-pub struct SubscriptionServer<Q, S> {
+pub struct SubscriptionServer<Q, S> { 
     logger: Logger,
     graphql_runner: Arc<Q>,
     store: Arc<S>,
