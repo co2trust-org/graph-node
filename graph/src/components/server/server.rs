@@ -35,23 +35,10 @@ where
     F: Fn(Request<Incoming>) -> S + Send + Clone + 'static,
     S: Future<Output = ServerResult> + Send + 'static,
 {
-    let ipv6_enabled = std::env::var("GRAPH_NODE_IPV6").unwrap_or_default() == "true";
-  
-    info!(
-        logger,
-        "Server binding configuration";
-        "ipv6_enabled" => ipv6_enabled,
-        "port" => port,
-    );
-
-    let addr = if ipv6_enabled {
-        let addr = SocketAddr::new(IpAddr::V6(Ipv6Addr::UNSPECIFIED), port);
-        info!(logger, "Binding to IPv6 address"; "address" => addr.to_string());
-        addr
+    let addr = if std::env::var("GRAPH_NODE_IPV6").unwrap_or_default() == "true" {
+        SocketAddr::new(IpAddr::V6(Ipv6Addr::UNSPECIFIED), port)
     } else {
-        let addr = SocketAddr::from(([0, 0, 0, 0], port));
-        info!(logger, "Binding to IPv4 address"; "address" => addr.to_string());
-        addr
+        SocketAddr::from(([0, 0, 0, 0], port))
     };
     let listener = TcpListener::bind(addr).await?;
     let accepting = Arc::new(AtomicBool::new(false));

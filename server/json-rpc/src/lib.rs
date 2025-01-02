@@ -33,7 +33,7 @@ impl JsonRpcServer {
 
         info!(
             logger,
-            "Starting JSON-RPC admin server at: http://localhost:{}", port
+            "Starting JSON-RPC admin server at: http://localhost:{}", port 
         );
 
         let state = ServerState {
@@ -44,7 +44,20 @@ impl JsonRpcServer {
             logger,
         };
 
-        let socket_addr: SocketAddr = (Ipv4Addr::new(0, 0, 0, 0), port).into();
+        let ipv6_enabled = std::env::var("GRAPH_NODE_IPV6").unwrap_or_default() == "true";
+    
+        info!(
+            logger,
+            "JSON-RPC server binding configuration";
+            "ipv6_enabled" => ipv6_enabled,
+            "port" => port,
+        );
+
+        let socket_addr = if ipv6_enabled {
+            SocketAddr::new(IpAddr::V6(Ipv6Addr::UNSPECIFIED), port)
+        } else {
+            SocketAddr::new(IpAddr::V4(Ipv4Addr::UNSPECIFIED), port)
+        };
         let http_server = HttpServerBuilder::default().build(socket_addr).await?;
 
         let mut rpc_module = RpcModule::new(state);
