@@ -19,6 +19,13 @@ lazy_static! {
 pub struct Opt {
     #[clap(
         long,
+        env = "GRAPH_NODE_IPV6",
+        default_value = "false",
+        help = "Enable IPv6 support for all servers"
+    )]
+    pub ipv6_enabled: bool,
+    #[clap(
+        long,
         env = "GRAPH_NODE_CONFIG",
         conflicts_with_all = &["postgres_url", "postgres_secondary_hosts", "postgres_host_weights"],
         required_unless_present = "postgres_url",
@@ -135,7 +142,7 @@ pub struct Opt {
     #[clap(
         long,
         default_value = "8001",
-        value_name = "PORT",
+        value_name = "PORT", 
         help = "Port for the GraphQL WebSocket server",
         env = "GRAPH_GRAPHQL_WS_PORT"
     )]
