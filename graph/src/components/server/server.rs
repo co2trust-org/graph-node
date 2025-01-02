@@ -1,5 +1,5 @@
 use std::future::Future;
-use std::net::SocketAddr;
+use std::net::{SocketAddr, IpAddr, Ipv6Addr};
 use std::sync::atomic::AtomicBool;
 use std::sync::Arc;
 
@@ -35,7 +35,11 @@ where
     F: Fn(Request<Incoming>) -> S + Send + Clone + 'static,
     S: Future<Output = ServerResult> + Send + 'static,
 {
-    let addr = SocketAddr::from(([0, 0, 0, 0], port));
+    let addr = if std::env::var("GRAPH_NODE_IPV6").unwrap_or_default() == "true" {
+        SocketAddr::new(IpAddr::V6(Ipv6Addr::UNSPECIFIED), port)
+    } else {
+        SocketAddr::from(([0, 0, 0, 0], port))
+    };
     let listener = TcpListener::bind(addr).await?;
     let accepting = Arc::new(AtomicBool::new(false));
     let accepting2 = accepting.cheap_clone();
